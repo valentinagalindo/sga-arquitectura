@@ -1,0 +1,6 @@
+{
+  "name": "SIGA — Arquitectura y Prototipo Académico",
+  "description": "Sistema de Información y Gestión Académica: documentación arquitectónica 4+1, trazabilidad y prototipo interactivo accesible.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

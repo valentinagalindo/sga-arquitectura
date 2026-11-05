@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGA — Portal Académico Institucional · PROTOTIPO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #4338CA;
+      --primary-hover: #3730A3;
+      --secondary: #6D28D9;
+      --accent: #7C3AED;
+      --support: #2563EB;
+      --bg: #EEF2FF;
+      --surface: #FFFFFF;
+      --text: #1E1B4B;
+      --muted: #475569;
+      --border: #C7D2FE;
+      --ok-bg: #ECFDF5;
+      --ok-text: #065F46;
+      --err-bg: #FEF2F2;
+      --err-text: #991B1B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    h1, h2, h3 { font-family: 'Sora', system-ui, sans-serif; letter-spacing: -0.015em; }
+    .tabular { font-variant-numeric: tabular-nums; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    header { background: var(--text); color: #FFFFFF; padding: 0.85rem 1.5rem; border-bottom: 1px solid #312E81; }
+    .header-inner { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .brand { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; color: #FFFFFF; text-decoration: none; }
+    nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    nav button { background: transparent; color: #E0E7FF; border: none; border-bottom: 2px solid transparent; padding: 0.35rem 0.2rem; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; min-height: 32px; }
+    nav button[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--accent); }
+    .session-strip { background: #FFFFFF; border-bottom: 1px solid var(--border); padding: 0.6rem 1.5rem; font-size: 0.8rem; }
+    .session-inner { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.95rem; min-height: 36px; border-radius: 0.5rem; font-family: inherit; font-size: 0.8rem; font-weight: 600; border: 1px solid transparent; cursor: pointer; transition: background-color 140ms ease; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #FFFFFF; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-secondary { background: var(--bg); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: #E0E7FF; }
+    .btn-danger { background: #FEE2E2; color: #991B1B; }
+    .container { max-width: 1240px; width: 100%; margin: 0 auto; padding: 1.5rem; flex: 1; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.4rem; margin-bottom: 1.25rem; }
+    .kicker { font-size: 0.75rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.25rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.85rem 1rem; }
+    .stat-label { font-size: 0.75rem; color: var(--muted); }
+    .stat-value { font-size: 1.35rem; font-weight: 700; margin-top: 0.2rem; }
+    label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 0.3rem; }
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], input[type="date"], input[type="time"], select {
+      width: 100%; padding: 0.5rem 0.7rem; min-height: 36px; border: 1px solid #A5B4FC; border-radius: 0.45rem; font-family: inherit; font-size: 0.82rem; color: var(--text); background: #FFFFFF;
+    }
+    .alert { padding: 0.85rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; margin-bottom: 1rem; border: 1px solid transparent; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+    .alert-ok { background: var(--ok-bg); color: var(--ok-text); border-color: #6EE7B7; }
+    .alert-err { background: var(--err-bg); color: var(--err-text); border-color: #FCA5A5; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 0.5rem; margin-top: 0.75rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+    th, td { padding: 0.65rem 0.8rem; border-bottom: 1px solid #E0E7FF; }
+    th { background: var(--bg); font-weight: 700; }
+    .pager { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 0.75rem; font-size: 0.78rem; flex-wrap: wrap; }
+    .hidden { display: none !important; }
+    footer { background: #FFFFFF; border-top: 1px solid var(--border); padding: 0.9rem 1.5rem; font-size: 0.75rem; color: var(--muted); text-align: center; }
+    @media print { header, .session-strip, footer, .no-print { display: none !important; } body { background: #FFFFFF; } .card { border: none; padding: 0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="#/panel" class="brand">SIGA · PROTOTIPO</a>
+      <nav id="role-nav" aria-label="Menú del rol autenticado" class="hidden"></nav>
+      <button type="button" id="btn-logout" class="btn btn-primary hidden">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div id="session-bar" class="session-strip hidden">
+    <div class="session-inner">
+      <div id="session-info"></div>
+      <div style="display:flex; gap:0.5rem;">
+        <button type="button" id="btn-open-pass" class="btn btn-secondary">Cambiar contraseña</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div id="alert-box" role="status" aria-live="polite" class="alert hidden">
+      <span id="alert-msg"></span>
+      <button type="button" id="alert-close" class="btn btn-secondary" style="padding:0.2rem 0.5rem; min-height:26px;">Cerrar</button>
+    </div>
+
+    <div id="pass-box" class="card hidden no-print">
+      <h2 style="font-size:1rem; margin-bottom:0.65rem;">Actualizar contraseña personal (Argon2id · RF-13)</h2>
+      <div style="display:flex; gap:0.65rem; flex-wrap:wrap; align-items:flex-end;">
+        <div style="flex:1; min-width:220px;">
+          <label for="new-pass-input">Nueva contraseña (mínimo 8 caracteres)</label>
+          <input id="new-pass-input" type="password" />
+        </div>
+        <button type="button" id="btn-save-pass" class="btn btn-primary">Guardar</button>
+        <button type="button" id="btn-cancel-pass" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <section id="screen-login" class="grid-2">
+      <div>
+        <p class="kicker">PORTAL ACADÉMICO UNIVERSITARIO · PROTOTIPO</p>
+        <h1 style="font-size:1.85rem; margin-bottom:0.75rem;">Sistema Integrado de Gestión Académica</h1>
+        <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.1rem;">
+          El rol, menú y permisos dependen exclusivamente de la cuenta con la que se inicia sesión. Cualquier acceso a una ruta no autorizada devuelve <strong>Acceso denegado (403)</strong> y escribe el evento en Auditoría.
+        </p>
+        <div class="card">
+          <h2 style="font-size:0.92rem; margin-bottom:0.6rem;">Cuentas Institucionales de Prueba (Clave: <code>Siga2026!</code>)</h2>
+          <div style="display:grid; gap:0.45rem;" id="quick-accounts"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="kicker">Autenticación Institucional · WCAG 2.2 AA</p>
+        <h2 style="font-size:1.3rem; margin-bottom:0.9rem;">Iniciar Sesión</h2>
+        <form id="form-login" novalidate>
+          <div style="margin-bottom:0.85rem;">
+            <label for="in-email">Correo institucional</label>
+            <input id="in-email" type="email" value="camila.rios@siga.edu.co" required />
+          </div>
+          <div style="margin-bottom:0.85rem;">
+            <label for="in-pass">Contraseña</label>
+            <input id="in-pass" type="password" value="Siga2026!" required />
+          </div>
+          <div style="margin-bottom:1rem; display:flex; gap:0.5rem; align-items:flex-start;">
+            <input id="in-habeas" type="checkbox" checked style="margin-top:0.25rem;" />
+            <label for="in-habeas" style="font-weight:400;">
+              Autorizo de forma previa, expresa e informada el tratamiento de mis datos personales conforme a la <strong>Ley 1581 de 2012</strong>.
+            </label>
+          </div>
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary" style="flex:1;">Ingresar al portal</button>
+            <button type="button" id="btn-recover" class="btn btn-secondary">Recuperar clave</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 403 FORBIDDEN -->
+    <section id="screen-403" class="card hidden" style="text-align:center; max-width:620px; margin:2rem auto;">
+      <p class="kicker" style="color:#991B1B;">CONTROL DE ACCESO BASADO EN ROLES</p>
+      <h1 style="font-size:1.6rem; margin-bottom:0.5rem;">Acceso denegado (403)</h1>
+      <p id="msg-403" style="font-size:0.88rem; color:var(--muted); margin-bottom:1.1rem;"></p>
+      <button type="button" id="btn-back-panel" class="btn btn-primary">Volver a mi panel de inicio</button>
+    </section>
+
+    <!-- CONTENEDOR DINÁMICO DE PANTALLAS AUTENTICADAS -->
+    <div id="app-viewport" class="hidden"></div>
+  </main>
+
+  <footer>SIGA · PROTOTIPO ACADÉMICO · Cumplimiento Ley 1581 de 2012 · Accesibilidad WCAG 2.2 AA</footer>
+
+  <script>
+    const MENUS = {
+      'Administrador': [
+        { route: 'panel', label: 'Inicio' },
+        { route: 'admin-usuarios', label: 'Usuarios y Perfiles' },
+        { route: 'admin-auditoria', label: 'Auditoría' }
+      ],
+      'Coordinador académico': [
+        { route: 'panel', label: 'Inicio' },
+        { route: 'coord-programas', label: 'Programas y Asignaturas' },
+        { route: 'coord-periodos', label: 'Periodos y Grupos' },
+        { route: 'coord-reportes', label: 'Reportes' }
+      ],
+      'Docente': [
+        { route: 'panel', label: 'Inicio' },
+        { route: 'docente-grupos', label: 'Mis Grupos y Notas' }
+      ],
+      'Estudiante': [
+        { route: 'panel', label: 'Inicio' },
+        { route: 'est-matricula', label: 'Matrícula' },
+        { route: 'est-horario', label: 'Mi Horario' },
+        { route: 'est-notas', label: 'Notas y Certificado' }
+      ]
+    };
+
+    const db = {
+      currentUser: null,
+      route: 'panel',
+      pages: {},
+      filters: {},
+      editUserId: null,
+      editProgId: null,
+      editPlanId: null,
+      editCourseId: null,
+      selectedTeacherGroupId: 'grp-01',
+      programas: [
+        { id: 'prog-is', codigo: 'SNIES-10421', nombre: 'Ingeniería de Software' },
+        { id: 'prog-cd', codigo: 'SNIES-10890', nombre: 'Ciencia de Datos y Analítica' }
+      ],
+      planes: [
+        { id: 'plan-is-2024', programaId: 'prog-is', version: 'IS-2024-V1', creditos: 160 },
+        { id: 'plan-cd-2025', programaId: 'prog-cd', version: 'CD-2025-V1', creditos: 152 }
+      ],
+      asignaturas: [
+        { id: 'a1', planId: 'plan-is-2024', codigo: 'IS-101', nombre: 'Fundamentos de Programación', creditos: 3, semestre: 1, prereq: [] },
+        { id: 'a2', planId: 'plan-is-2024', codigo: 'CB-102', nombre: 'Cálculo Diferencial', creditos: 4, semestre: 1, prereq: [] },
+        { id: 'a3', planId: 'plan-is-2024', codigo: 'IS-201', nombre: 'Estructuras de Datos', creditos: 4, semestre: 3, prereq: ['IS-101'] },
+        { id: 'a4', planId: 'plan-is-2024', codigo: 'IS-205', nombre: 'Bases de Datos Relacionales', creditos: 3, semestre: 4, prereq: ['IS-201'] },
+        { id: 'a5', planId: 'plan-is-2024', codigo: 'IS-304', nombre: 'Arquitectura de Software', creditos: 4, semestre: 6, prereq: ['IS-201', 'IS-205'] },
+        { id: 'a6', planId: 'plan-is-2024', codigo: 'IS-310', nombre: 'Seguridad en Aplicaciones Web', creditos: 3, semestre: 6, prereq: ['IS-205'] },
+        { id: 'a7', planId: 'plan-is-2024', codigo: 'IS-320', nombre: 'Sistemas Distribuidos', creditos: 4, semestre: 7, prereq: ['IS-304'] },
+        { id: 'a8', planId: 'plan-cd-2025', codigo: 'CB-210', nombre: 'Estadística Inferencial', creditos: 3, semestre: 4, prereq: ['CB-102'] },
+        { id: 'a9', planId: 'plan-is-2024', codigo: 'HU-105', nombre: 'Ética y Legislación Informática', creditos: 2, semestre: 5, prereq: [] }
+      ],
+      usuarios: [
+        { id: 'usr-admin-01', correo: 'hernan.castro@siga.edu.co', nombre: 'Hernán Darío Castro', doc: '79845120', rol: 'Administrador', codigo: 'ADM-001', activo: true, bloqueado: false, intentos: 0 },
+        { id: 'usr-coord-01', correo: 'patricia.lozano@siga.edu.co', nombre: 'Patricia Lozano Vélez', doc: '52418930', rol: 'Coordinador académico', codigo: 'COORD-310', activo: true, bloqueado: false, intentos: 0 },
+        { id: 'usr-doc-01', correo: 'alejandro.mendoza@siga.edu.co', nombre: 'Alejandro Mendoza Pardo', doc: '80142910', rol: 'Docente', codigo: 'DOC-88041', esp: 'Arquitectura de Software', activo: true, bloqueado: false, intentos: 0 },
+        { id: 'usr-doc-02', correo: 'clara.restrepo@siga.edu.co', nombre: 'Clara Inés Restrepo', doc: '43612098', rol: 'Docente', codigo: 'DOC-88095', esp: 'Ciberseguridad', activo: true, bloqueado: false, intentos: 0 },
+        { id: 'usr-est-01', correo: 'camila.rios@siga.edu.co', nombre: 'Camila Andrea Ríos', doc: '1019482310', rol: 'Estudiante', codigo: 'EST-2024108', programaId: 'prog-is', activo: true, bloqueado: false, intentos: 0 },
+        { id: 'usr-est-02', correo: 'sebastian.morales@siga.edu.co', nombre: 'Sebastián Morales Ortega', doc: '1020741955', rol: 'Estudiante', codigo: 'EST-2024119', programaId: 'prog-is', activo: true, bloqueado: false, intentos: 0 }
+      ],
+      periodos: [
+        { codigo: '2026-1', nombre: 'Primer Semestre 2026', estado: 'cerrado', ini: '2026-01-10', fin: '2026-02-05' },
+        { codigo: '2026-2', nombre: 'Segundo Semestre 2026', estado: 'matrícula abierta', ini: '2026-10-01', fin: '2026-12-15' }
+      ],
+      grupos: [
+        { id: 'grp-01', cod: 'IS304-01', asigCod: 'IS-304', asigNom: 'Arquitectura de Software', cred: 4, prereq: ['IS-201', 'IS-205'], docenteId: 'usr-doc-01', docenteNom: 'Alejandro Mendoza Pardo', periodo: '2026-2', cupoMax: 25, cupoOcup: 19, dia: 'Martes', ini: 420, fin: 540, horario: 'Martes 07:00–09:00', aula: 'Edificio B · 302', inscritoEst01: true },
+        { id: 'grp-02', cod: 'IS310-01', asigCod: 'IS-310', asigNom: 'Seguridad en Aplicaciones Web', cred: 3, prereq: ['IS-205'], docenteId: 'usr-doc-02', docenteNom: 'Clara Inés Restrepo', periodo: '2026-2', cupoMax: 20, cupoOcup: 14, dia: 'Miércoles', ini: 600, fin: 780, horario: 'Miércoles 10:00–13:00', aula: 'Laboratorio 104', inscritoEst01: false },
+        { id: 'grp-03', cod: 'IS320-02', asigCod: 'IS-320', asigNom: 'Sistemas Distribuidos', cred: 4, prereq: ['IS-304'], docenteId: 'usr-doc-01', docenteNom: 'Alejandro Mendoza Pardo', periodo: '2026-2', cupoMax: 25, cupoOcup: 12, dia: 'Viernes', ini: 480, fin: 660, horario: 'Viernes 08:00–11:00', aula: 'Edificio A · 205', inscritoEst01: false },
+        { id: 'grp-04', cod: 'CB210-01', asigCod: 'CB-210', asigNom: 'Estadística Inferencial', cred: 3, prereq: ['CB-102'], docenteId: 'usr-doc-02', docenteNom: 'Clara Inés Restrepo', periodo: '2026-2', cupoMax: 30, cupoOcup: 24, dia: 'Martes', ini: 480, fin: 600, horario: 'Martes 08:00–10:00', aula: 'Edificio C · 108', inscritoEst01: false },
+        { id: 'grp-05', cod: 'HU105-03', asigCod: 'HU-105', asigNom: 'Ética y Legislación Informática', cred: 2, prereq: [], docenteId: 'usr-doc-02', docenteNom: 'Clara Inés Restrepo', periodo: '2026-2', cupoMax: 20, cupoOcup: 20, dia: 'Lunes', ini: 840, fin: 960, horario: 'Lunes 14:00–16:00', aula: 'Edificio D · 12', inscritoEst01: false }
+      ],
+      aprobadasEst01: [
+        { periodo: '2025-1', cod: 'IS-101', nom: 'Fundamentos de Programación', cred: 3, nota: 4.30 },
+        { periodo: '2025-1', cod: 'CB-102', nom: 'Cálculo Diferencial', cred: 4, nota: 3.90 },
+        { periodo: '2025-2', cod: 'IS-201', nom: 'Estructuras de Datos', cred: 4, nota: 4.50 },
+        { periodo: '2026-1', cod: 'IS-205', nom: 'Bases de Datos Relacionales', cred: 3, nota: 4.10 }
+      ],
+      calificaciones: [
+        { id: 'cal-01', grupoId: 'grp-01', grupoCod: 'IS304-01', periodo: '2026-2', programaId: 'prog-is', asigCod: 'IS-304', asigNom: 'Arquitectura de Software', cred: 4, estId: 'usr-est-01', estCod: 'EST-2024108', estNom: 'Camila Andrea Ríos', c1: 4.2, c2: 4.4, ex: 4.0, estado: 'borrador' },
+        { id: 'cal-02', grupoId: 'grp-01', grupoCod: 'IS304-01', periodo: '2026-2', programaId: 'prog-is', asigCod: 'IS-304', asigNom: 'Arquitectura de Software', cred: 4, estId: 'usr-est-02', estCod: 'EST-2024119', estNom: 'Sebastián Morales Ortega', c1: 3.6, c2: 3.8, ex: 3.9, estado: 'publicada' },
+        { id: 'cal-03', grupoId: 'grp-02', grupoCod: 'IS310-01', periodo: '2026-2', programaId: 'prog-cd', asigCod: 'IS-310', asigNom: 'Seguridad en Aplicaciones Web', cred: 3, estId: 'usr-est-02', estCod: 'EST-2024119', estNom: 'Sebastián Morales Ortega', c1: 4.5, c2: 4.2, ex: 4.4, estado: 'publicada' }
+      ],
+      auditoria: [
+        { fecha: '2026-11-01 08:30:00', usuario: 'patricia.lozano@siga.edu.co', accion: 'CAMBIO_ESTADO_PERIODO', registro: 'PeriodoAcadémico:2026-2', detalle: 'Apertura de ventana de matrícula.' },
+        { fecha: '2026-11-01 15:10:00', usuario: 'alejandro.mendoza@siga.edu.co', accion: 'CALIFICACION_PUBLICADA', registro: 'Calificación:cal-02', detalle: 'Nota publicada en grupo IS304-01.' }
+      ],
+      notificaciones: [
+        { fecha: '2026-06-12 16:11', estId: 'usr-est-01', tipo: 'NOTA_PUBLICADA', msg: 'Publicada calificación definitiva (4.10) en Bases de Datos Relacionales.' }
+      ]
+    };
+
+    function nowStr() { return new Date().toISOString().slice(0, 19).replace('T', ' '); }
+    function logAudit(usuario, accion, registro, detalle) {
+      db.auditoria.unshift({ fecha: nowStr(), usuario, accion, registro, detalle });
+    }
+    function notify(msg, ok = true) {
+      const box = document.getElementById('alert-box');
+      document.getElementById('alert-msg').textContent = msg;
+      box.className = 'alert ' + (ok ? 'alert-ok' : 'alert-err');
+      box.classList.remove('hidden');
+    }
+    function paginate(arr, key, size = 4) {
+      const total = arr.length;
+      const pages = Math.max(1, Math.ceil(total / size));
+      const cur = Math.min(Math.max(1, db.pages[key] || 1), pages);
+      db.pages[key] = cur;
+      return { slice: arr.slice((cur - 1) * size, cur * size), cur, pages, total };
+    }
+    function pagerHtml(key, p) {
+      return '<div class="pager"><span class="tabular">Total: <strong>' + p.total + '</strong> registros · Página ' + p.cur + ' de ' + p.pages + '</span>' +
+        '<div style="display:flex; gap:0.4rem;">' +
+        '<button type="button" class="btn btn-secondary" data-pg="' + key + ':-1" ' + (p.cur <= 1 ? 'disabled' : '') + '>Anterior</button>' +
+        '<button type="button" class="btn btn-secondary" data-pg="' + key + ':1" ' + (p.cur >= p.pages ? 'disabled' : '') + '>Siguiente</button></div></div>';
+    }
+    function canAccess(rol, route) {
+      return (MENUS[rol] || []).some(m => m.route === route);
+    }
+
+    function navigate(route) {
+      db.route = route;
+      window.location.hash = '#/' + route;
+      if (db.currentUser && !canAccess(db.currentUser.rol, route)) {
+        logAudit(db.currentUser.correo, 'ACCESO_DENEGADO_403', 'Ruta:/#/' + route, 'Intento bloqueado desde rol ' + db.currentUser.rol);
+      }
+      render();
+    }
+
+    function renderQuickAccounts() {
+      document.getElementById('quick-accounts').innerHTML = db.usuarios.slice(0, 5).map(u =>
+        '<button type="button" class="btn btn-secondary" style="justify-content:space-between;" data-fill="' + u.correo + '">' +
+        '<span><strong>' + u.rol + '</strong> · ' + u.nombre + '</span><span class="tabular">' + u.correo + '</span></button>'
+      ).join('');
+    }
+
+    function render() {
+      renderQuickAccounts();
+      const logged = Boolean(db.currentUser);
+      document.getElementById('screen-login').classList.toggle('hidden', logged);
+      document.getElementById('role-nav').classList.toggle('hidden', !logged);
+      document.getElementById('btn-logout').classList.toggle('hidden', !logged);
+      document.getElementById('session-bar').classList.toggle('hidden', !logged);
+      if (!logged) {
+        document.getElementById('screen-403').classList.add('hidden');
+        document.getElementById('app-viewport').classList.add('hidden');
+        return;
+      }
+
+      const u = db.currentUser;
+      const per2 = db.periodos.find(p => p.codigo === '2026-2') || db.periodos[0];
+      document.getElementById('session-info').innerHTML =
+        '<strong>PROTOTIPO</strong> · Usuario: <strong>' + u.nombre + '</strong> (' + u.codigo + ') · Rol de sesión: <strong>' + u.rol + '</strong> · Periodo ' + per2.codigo + ': <strong>' + per2.estado + '</strong>';
+
+      document.getElementById('role-nav').innerHTML = MENUS[u.rol].map(m =>
+        '<button type="button" data-nav="' + m.route + '" ' + (db.route === m.route ? 'aria-current="page"' : '') + '>' + m.label + '</button>'
+      ).join('');
+
+      if (!canAccess(u.rol, db.route)) {
+        document.getElementById('screen-403').classList.remove('hidden');
+        document.getElementById('app-viewport').classList.add('hidden');
+        document.getElementById('msg-403').textContent =
+          'El perfil actual (' + u.rol + ') no posee autorización sobre la ruta /#/' + db.route + '. El evento ha sido registrado en Auditoría.';
+        return;
+      }
+
+      document.getElementById('screen-403').classList.add('hidden');
+      const vp = document.getElementById('app-viewport');
+      vp.classList.remove('hidden');
+
+      if (db.route === 'panel') {
+        const qNot = (db.filters.notQ || '').toLowerCase();
+        const notifs = db.notificaciones.filter(n => (u.rol === 'Administrador' || n.estId === u.id) && (!qNot || n.msg.toLowerCase().includes(qNot)));
+        const pgN = paginate(notifs, 'notif', 4);
+        vp.innerHTML = '<div class="card"><p class="kicker">RF-20 · Panel de Inicio Exclusivo por Rol</p><h1 style="font-size:1.45rem;">Bienvenido, ' + u.nombre + ' (' + u.rol + ')</h1>' +
+          '<p style="font-size:0.82rem; color:var(--muted); margin-top:0.25rem;">Utilice el menú superior asignado a su rol. Puede verificar el bloqueo RBAC probando una ruta restringida: <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.6rem; min-height:28px;" data-nav="' + (u.rol === 'Administrador' ? 'est-matricula' : 'admin-auditoria') + '">Probar ruta ajena (403)</button></p></div>' +
+          '<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;"><h2 style="font-size:1.05rem;">Bandeja de Notificaciones (RF-17)</h2>' +
+          '<input type="search" aria-label="Buscar notificaciones" placeholder="Buscar notificación..." value="' + (db.filters.notQ || '') + '" data-flt="notQ" style="max-width:240px;"/></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Mensaje</th></tr></thead><tbody>' +
+          (pgN.slice.map(n => '<tr><td class="tabular">' + n.fecha + '</td><td><strong>' + n.tipo + '</strong></td><td>' + n.msg + '</td></tr>').join('') || '<tr><td colspan="3">Sin notificaciones registradas.</td></tr>') +
+          '</tbody></table></div>' + pagerHtml('notif', pgN) + '</div>';
+      }
+
+      else if (db.route === 'admin-usuarios') {
+        const q = (db.filters.usrQ || '').toLowerCase();
+        const rf = db.filters.usrRol || 'TODOS';
+        const list = db.usuarios.filter(x => (!q || x.nombre.toLowerCase().includes(q) || x.correo.toLowerCase().includes(q) || x.codigo.toLowerCase().includes(q)) && (rf === 'TODOS' || x.rol === rf));
+        const pg = paginate(list, 'usr', 4);
+        const ed = db.usuarios.find(x => x.id === db.editUserId);
+        vp.innerHTML = '<div class="card"><p class="kicker">Módulo Seguridad · Gestión de Usuarios, Estudiantes y Docentes</p><h1 style="font-size:1.3rem; margin-bottom:0.8rem;">' + (ed ? 'Editar Cuenta / Rol' : 'Crear Usuario, Estudiante o Docente') + '</h1>' +
+          '<form id="form-usr" class="grid-3" novalidate>' +
+          '<div><label>Nombre completo</label><input id="u-nom" type="text" value="' + (ed ? ed.nombre : '') + '" required/></div>' +
+          '<div><label>Correo institucional</label><input id="u-cor" type="email" value="' + (ed ? ed.correo : '') + '" required/></div>' +
+          '<div><label>Documento (6-12 dígitos)</label><input id="u-doc" type="text" value="' + (ed ? ed.doc : '') + '" required/></div>' +
+          '<div><label>Rol</label><select id="u-rol">' + ['Estudiante', 'Docente', 'Coordinador académico', 'Administrador'].map(r => '<option value="' + r + '" ' + (ed && ed.rol === r ? 'selected' : '') + '>' + r + '</option>').join('') + '</select></div>' +
+          '<div><label>Código institucional</label><input id="u-cod" type="text" value="' + (ed ? ed.codigo : '') + '" required/></div>' +
+          '<div style="display:flex; align-items:flex-end; gap:0.5rem;"><button type="submit" class="btn btn-primary">' + (ed ? 'Actualizar' : 'Crear cuenta') + '</button>' + (ed ? '<button type="button" id="u-cancel" class="btn btn-secondary">Cancelar</button>' : '') + '</div></form></div>' +
+          '<div class="card"><div style="display:flex; justify-content:space-between; gap:0.75rem; flex-wrap:wrap;"><input type="search" aria-label="Buscar usuarios" placeholder="Buscar por nombre, correo o código..." value="' + (db.filters.usrQ || '') + '" data-flt="usrQ" style="max-width:260px;"/>' +
+          '<select aria-label="Filtrar rol" data-flt="usrRol" style="max-width:220px;"><option value="TODOS">Todos los roles</option>' + ['Estudiante', 'Docente', 'Coordinador académico', 'Administrador'].map(r => '<option value="' + r + '" ' + (rf === r ? 'selected' : '') + '>' + r + '</option>').join('') + '</select></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Código / Nombre</th><th>Correo / Doc</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>' +
+          pg.slice.map(x => '<tr><td><strong>' + x.codigo + '</strong> · ' + x.nombre + '</td><td class="tabular">' + x.correo + ' (' + x.doc + ')</td><td>' + x.rol + '</td><td>' + (!x.activo ? 'Desactivado' : x.bloqueado ? 'Bloqueado' : 'Activo') + '</td>' +
+            '<td style="display:flex; gap:0.35rem; flex-wrap:wrap;"><button type="button" class="btn btn-secondary" data-uedit="' + x.id + '">Editar</button>' +
+            (x.id !== u.id ? '<button type="button" class="btn btn-secondary" data-ulock="' + x.id + '">' + (x.bloqueado ? 'Desbloquear' : 'Bloquear') + '</button><button type="button" class="btn btn-danger" data-uact="' + x.id + '">' + (x.activo ? 'Desactivar' : 'Activar') + '</button>' : '') + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('usr', pg) + '</div>';
+      }
+
+      else if (db.route === 'admin-auditoria') {
+        const qu = (db.filters.audU || '').toLowerCase();
+        const qa = db.filters.audA || 'TODAS';
+        const qf = db.filters.audF || '';
+        const accs = Array.from(new Set(db.auditoria.map(a => a.accion)));
+        const list = db.auditoria.filter(a => (!qu || a.usuario.toLowerCase().includes(qu) || a.registro.toLowerCase().includes(qu)) && (qa === 'TODAS' || a.accion === qa) && (!qf || a.fecha.startsWith(qf)));
+        const pg = paginate(list, 'aud', 5);
+        vp.innerHTML = '<div class="card"><p class="kicker">Módulo Auditoría · Filtros por Usuario, Acción y Fecha (RF-12)</p><h1 style="font-size:1.35rem; margin-bottom:0.8rem;">Bitácora de Eventos de Auditoría</h1>' +
+          '<div class="grid-3"><input type="search" aria-label="Filtrar por usuario" placeholder="Usuario o registro afectado..." value="' + (db.filters.audU || '') + '" data-flt="audU"/>' +
+          '<select aria-label="Filtrar por acción" data-flt="audA"><option value="TODAS">Todas las acciones</option>' + accs.map(ac => '<option value="' + ac + '" ' + (qa === ac ? 'selected' : '') + '>' + ac + '</option>').join('') + '</select>' +
+          '<input type="date" aria-label="Filtrar por fecha" value="' + qf + '" data-flt="audF"/></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Registro Afectado</th><th>Detalle</th></tr></thead><tbody>' +
+          pg.slice.map(a => '<tr><td class="tabular">' + a.fecha + '</td><td class="tabular">' + a.usuario + '</td><td><strong>' + a.accion + '</strong></td><td class="tabular">' + a.registro + '</td><td>' + a.detalle + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('aud', pg) + '</div>';
+      }
+
+      else if (db.route === 'coord-programas') {
+        const qa = (db.filters.asigQ || '').toLowerCase();
+        const semF = db.filters.asigSem || 'TODOS';
+        const list = db.asignaturas.filter(a => (!qa || a.codigo.toLowerCase().includes(qa) || a.nombre.toLowerCase().includes(qa)) && (semF === 'TODOS' || String(a.semestre) === semF));
+        const pg = paginate(list, 'asig', 4);
+        const edP = db.programas.find(p => p.id === db.editProgId);
+        const edPl = db.planes.find(pl => pl.id === db.editPlanId);
+        const ed = db.asignaturas.find(a => a.id === db.editCourseId);
+        vp.innerHTML = '<div class="grid-2">' +
+          '<div class="card"><h2 style="font-size:1.05rem; margin-bottom:0.6rem;">' + (edP ? 'Editar Programa Académico' : 'Crear Programa Académico') + '</h2><form id="form-prog" class="grid-2" novalidate>' +
+          '<div><label for="p-cod">Código</label><input id="p-cod" type="text" value="' + (edP ? edP.codigo : '') + '" placeholder="SNIES-11500" required/></div><div><label for="p-nom">Nombre Programa</label><input id="p-nom" type="text" value="' + (edP ? edP.nombre : '') + '" placeholder="Ingeniería de Datos" required/></div>' +
+          '<div style="display:flex; gap:0.4rem;"><button type="submit" class="btn btn-primary">' + (edP ? 'Actualizar Programa' : 'Guardar Programa') + '</button>' + (edP ? '<button type="button" id="p-cancel" class="btn btn-secondary">Cancelar</button>' : '') + '</div></form>' +
+          '<div style="margin-top:0.75rem; font-size:0.78rem;">' + db.programas.map(p => '<div style="display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid #E0E7FF;"><span><strong>' + p.codigo + '</strong> · ' + p.nombre + '</span><button type="button" class="btn btn-secondary" style="padding:0.15rem 0.5rem; min-height:24px;" data-pedit="' + p.id + '">Editar</button></div>').join('') + '</div></div>' +
+          '<div class="card"><h2 style="font-size:1.05rem; margin-bottom:0.6rem;">' + (edPl ? 'Editar Plan de Estudio' : 'Crear Plan de Estudio') + '</h2><form id="form-plan" class="grid-3" novalidate>' +
+          '<div><label for="pl-prog">Programa</label><select id="pl-prog">' + db.programas.map(p => '<option value="' + p.id + '" ' + (edPl && edPl.programaId === p.id ? 'selected' : '') + '>' + p.nombre + '</option>').join('') + '</select></div>' +
+          '<div><label for="pl-ver">Versión</label><input id="pl-ver" type="text" value="' + (edPl ? edPl.version : '') + '" placeholder="IS-2026-V2" required/></div>' +
+          '<div><label for="pl-cred">Créditos Totales</label><input id="pl-cred" type="number" min="60" max="220" value="' + (edPl ? edPl.creditos : 160) + '" required/></div>' +
+          '<div style="display:flex; gap:0.4rem;"><button type="submit" class="btn btn-primary">' + (edPl ? 'Actualizar Plan' : 'Guardar Plan') + '</button>' + (edPl ? '<button type="button" id="pl-cancel" class="btn btn-secondary">Cancelar</button>' : '') + '</div></form>' +
+          '<div style="margin-top:0.75rem; font-size:0.78rem;">' + db.planes.map(pl => '<div style="display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid #E0E7FF;"><span><strong>' + pl.version + '</strong> (' + pl.creditos + ' créd.)</span><button type="button" class="btn btn-secondary" style="padding:0.15rem 0.5rem; min-height:24px;" data-pledit="' + pl.id + '">Editar</button></div>').join('') + '</div></div></div>' +
+          '<div class="card"><h2 style="font-size:1.05rem; margin-bottom:0.6rem;">' + (ed ? 'Editar Asignatura' : 'Crear Asignatura') + '</h2><form id="form-asig" class="grid-4" style="margin-top:0;" novalidate>' +
+          '<div><label for="a-cod">Código</label><input id="a-cod" type="text" value="' + (ed ? ed.codigo : '') + '" placeholder="IS-401" required/></div>' +
+          '<div><label for="a-nom">Nombre</label><input id="a-nom" type="text" value="' + (ed ? ed.nombre : '') + '" placeholder="Arquitectura Cloud" required/></div>' +
+          '<div><label for="a-cred">Créditos / Semestre</label><div style="display:flex; gap:0.35rem;"><input id="a-cred" type="number" min="1" max="12" value="' + (ed ? ed.creditos : 3) + '" aria-label="Créditos"/><input id="a-sem" type="number" min="1" max="10" value="' + (ed ? ed.semestre : 1) + '" aria-label="Semestre"/></div></div>' +
+          '<div style="display:flex; align-items:flex-end; gap:0.4rem;"><button type="submit" class="btn btn-primary">' + (ed ? 'Actualizar Asignatura' : 'Guardar Asignatura') + '</button>' + (ed ? '<button type="button" id="a-cancel" class="btn btn-secondary">Cancelar</button>' : '') + '</div></form></div>' +
+          '<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap;"><h2 style="font-size:1.1rem;">Catálogo de Asignaturas</h2><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><input type="search" aria-label="Buscar asignatura" placeholder="Buscar por código o nombre..." value="' + (db.filters.asigQ || '') + '" data-flt="asigQ" style="max-width:220px;"/><select aria-label="Filtrar semestre" data-flt="asigSem" style="max-width:170px;"><option value="TODOS">Todos los semestres</option>' + [1,2,3,4,5,6,7,8,9,10].map(s => '<option value="' + s + '" ' + (semF === String(s) ? 'selected' : '') + '>Semestre ' + s + '</option>').join('') + '</select></div></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Créditos</th><th>Semestre</th><th>Acción</th></tr></thead><tbody>' +
+          pg.slice.map(a => '<tr><td class="tabular"><strong>' + a.codigo + '</strong></td><td>' + a.nombre + '</td><td class="tabular">' + a.creditos + '</td><td class="tabular">' + a.semestre + '</td><td><button type="button" class="btn btn-secondary" data-aedit="' + a.id + '">Editar</button></td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('asig', pg) + '</div>';
+      }
+
+      else if (db.route === 'coord-periodos') {
+        const qg = (db.filters.grpQ || '').toLowerCase();
+        const perF = db.filters.grpPer || 'TODOS';
+        const docs = db.usuarios.filter(x => x.rol === 'Docente' && x.activo);
+        const list = db.grupos.filter(g => (!qg || g.cod.toLowerCase().includes(qg) || g.asigNom.toLowerCase().includes(qg)) && (perF === 'TODOS' || g.periodo === perF));
+        const pg = paginate(list, 'grp', 4);
+        vp.innerHTML = '<div class="card"><h1 style="font-size:1.25rem; margin-bottom:0.65rem;">Periodos Académicos y Estados (RF-14)</h1>' +
+          '<form id="form-per" class="grid-3" style="margin-bottom:0.8rem;" novalidate><div><label for="per-c">Código Periodo</label><input id="per-c" type="text" placeholder="2027-1"/></div><div><label for="per-n">Nombre</label><input id="per-n" type="text" placeholder="Primer Semestre 2027"/></div><div style="display:flex; align-items:flex-end;"><button type="submit" class="btn btn-primary">Crear Periodo</button></div></form>' +
+          '<div class="table-wrap"><table><thead><tr><th>Periodo</th><th>Estado Actual</th><th>Cambiar Estado</th></tr></thead><tbody>' +
+          db.periodos.map(p => '<tr><td><strong>' + p.codigo + '</strong> · ' + p.nombre + '</td><td><strong>' + p.estado + '</strong></td><td style="display:flex; gap:0.35rem; flex-wrap:wrap;">' +
+            ['planeado', 'matrícula abierta', 'en curso', 'cerrado'].map(st => '<button type="button" class="btn ' + (p.estado === st ? 'btn-primary' : 'btn-secondary') + '" data-pstate="' + p.codigo + ':' + st + '">' + st + '</button>').join('') + '</td></tr>').join('') +
+          '</tbody></table></div></div>' +
+          '<div class="card"><h2 style="font-size:1.15rem; margin-bottom:0.65rem;">Abrir Nuevo Grupo (Cupo, Docente, Horario y Aula)</h2>' +
+          '<form id="form-grp" class="grid-3" novalidate>' +
+          '<div><label for="g-cod">Código Grupo</label><input id="g-cod" type="text" placeholder="IS304-02"/></div>' +
+          '<div><label for="g-asig">Asignatura</label><select id="g-asig">' + db.asignaturas.map(a => '<option value="' + a.id + '">' + a.codigo + ' · ' + a.nombre + '</option>').join('') + '</select></div>' +
+          '<div><label for="g-doc">Docente Titular</label><select id="g-doc">' + docs.map(d => '<option value="' + d.id + '">' + d.nombre + '</option>').join('') + '</select></div>' +
+          '<div><label for="g-dia">Día y Horario</label><div style="display:flex; gap:0.35rem;"><select id="g-dia" aria-label="Día">' + ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'].map(d => '<option value="' + d + '">' + d + '</option>').join('') + '</select><input id="g-hini" type="time" value="08:00" aria-label="Hora inicio"/><input id="g-hfin" type="time" value="10:00" aria-label="Hora fin"/></div></div>' +
+          '<div><label for="g-cupo">Cupo / Aula</label><div style="display:flex; gap:0.35rem;"><input id="g-cupo" type="number" min="5" max="80" value="25" aria-label="Cupo"/><input id="g-aula" type="text" value="Edificio B · 204" aria-label="Aula"/></div></div>' +
+          '<div style="display:flex; align-items:flex-end;"><button type="submit" class="btn btn-primary">Crear Grupo</button></div></form>' +
+          '<div style="margin-top:0.9rem; display:flex; gap:0.5rem; flex-wrap:wrap;"><input type="search" aria-label="Filtrar grupos" placeholder="Buscar grupo o asignatura..." value="' + (db.filters.grpQ || '') + '" data-flt="grpQ" style="max-width:240px;"/><select aria-label="Filtrar periodo grupo" data-flt="grpPer" style="max-width:180px;"><option value="TODOS">Todos los periodos</option>' + db.periodos.map(p => '<option value="' + p.codigo + '" ' + (perF === p.codigo ? 'selected' : '') + '>' + p.codigo + '</option>').join('') + '</select></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Grupo / Asignatura</th><th>Docente</th><th>Horario y Aula</th><th>Cupos</th></tr></thead><tbody>' +
+          pg.slice.map(g => '<tr><td><strong>' + g.cod + '</strong> · ' + g.asigNom + '</td><td>' + g.docenteNom + '</td><td class="tabular">' + g.horario + ' (' + g.aula + ')</td><td class="tabular">' + g.cupoOcup + '/' + g.cupoMax + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('grp', pg) + '</div>';
+      }
+
+      else if (db.route === 'coord-reportes') {
+        const fp = db.filters.repPer || 'TODOS';
+        const fpr = db.filters.repProg || 'TODOS';
+        const fq = (db.filters.repQ || '').toLowerCase();
+        const rows = db.calificaciones.filter(c => (fp === 'TODOS' || c.periodo === fp) && (fpr === 'TODOS' || c.programaId === fpr) && (!fq || c.estNom.toLowerCase().includes(fq) || c.asigNom.toLowerCase().includes(fq)));
+        const pg = paginate(rows, 'rep', 4);
+        vp.innerHTML = '<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;"><div><p class="kicker">Módulo Reportes · Filtros por Periodo y Programa (RF-10 y RF-18)</p><h1 style="font-size:1.35rem;">Reporte Consolidado Académico</h1></div>' +
+          '<div class="no-print" style="display:flex; gap:0.5rem;"><button type="button" id="btn-rep-csv" class="btn btn-secondary">Exportar CSV</button><button type="button" id="btn-rep-pdf" class="btn btn-primary">Exportar PDF</button></div></div>' +
+          '<div class="grid-3 no-print" style="margin-top:0.85rem;">' +
+          '<div><label>Periodo Académico</label><select data-flt="repPer"><option value="TODOS">Todos</option>' + db.periodos.map(p => '<option value="' + p.codigo + '" ' + (fp === p.codigo ? 'selected' : '') + '>' + p.codigo + '</option>').join('') + '</select></div>' +
+          '<div><label>Programa Académico</label><select data-flt="repProg"><option value="TODOS">Todos</option>' + db.programas.map(p => '<option value="' + p.id + '" ' + (fpr === p.id ? 'selected' : '') + '>' + p.nombre + '</option>').join('') + '</select></div>' +
+          '<div><label>Buscar Estudiante / Asignatura</label><input type="search" value="' + (db.filters.repQ || '') + '" data-flt="repQ" placeholder="Filtrar..."/></div></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Periodo</th><th>Programa</th><th>Grupo / Asignatura</th><th>Estudiante</th><th>Definitiva</th><th>Estado</th></tr></thead><tbody>' +
+          pg.slice.map(r => '<tr><td class="tabular">' + r.periodo + '</td><td>' + (db.programas.find(p => p.id === r.programaId)?.nombre || '') + '</td><td><strong>' + r.grupoCod + '</strong> · ' + r.asigNom + '</td><td>' + r.estNom + '</td><td class="tabular"><strong>' + (r.c1 * 0.3 + r.c2 * 0.3 + r.ex * 0.4).toFixed(2) + '</strong></td><td>' + r.estado + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('rep', pg) + '</div>';
+      }
+
+      else if (db.route === 'docente-grupos') {
+        const own = db.grupos.filter(g => g.docenteId === u.id);
+        const curGrp = own.find(g => g.id === db.selectedTeacherGroupId) || own[0];
+        const q = (db.filters.docQ || '').toLowerCase();
+        const rows = db.calificaciones.filter(c => curGrp && c.grupoId === curGrp.id && (!q || c.estNom.toLowerCase().includes(q)));
+        const pg = paginate(rows, 'doc', 4);
+        vp.innerHTML = '<div class="card"><p class="kicker">Módulo Calificaciones · Grupos Titulares de ' + u.nombre + '</p><h1 style="font-size:1.35rem; margin-bottom:0.5rem;">Mis Grupos y Planillas de Clase</h1>' +
+          '<div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.85rem;">' + own.map(g => '<button type="button" class="btn ' + (curGrp && curGrp.id === g.id ? 'btn-primary' : 'btn-secondary') + '" data-dgrp="' + g.id + '">' + g.cod + ' · ' + g.asigNom + '</button>').join('') + '</div>' +
+          '<input type="search" placeholder="Buscar estudiante en mi lista..." value="' + (db.filters.docQ || '') + '" data-flt="docQ" style="max-width:260px;"/>' +
+          '<div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Corte 1</th><th>Corte 2</th><th>Examen</th><th>Definitiva</th><th>Estado</th><th>Acción</th></tr></thead><tbody>' +
+          pg.slice.map(c => {
+            const def = (c.c1 * 0.3 + c.c2 * 0.3 + c.ex * 0.4).toFixed(2);
+            const ed = c.estado === 'borrador';
+            return '<tr><td><strong>' + c.estNom + '</strong> (' + c.estCod + ')</td>' +
+              '<td>' + (ed ? '<input type="number" step="0.1" min="0" max="5" value="' + c.c1 + '" data-cnote="' + c.id + ':c1" style="width:68px"/>' : c.c1.toFixed(1)) + '</td>' +
+              '<td>' + (ed ? '<input type="number" step="0.1" min="0" max="5" value="' + c.c2 + '" data-cnote="' + c.id + ':c2" style="width:68px"/>' : c.c2.toFixed(1)) + '</td>' +
+              '<td>' + (ed ? '<input type="number" step="0.1" min="0" max="5" value="' + c.ex + '" data-cnote="' + c.id + ':ex" style="width:68px"/>' : c.ex.toFixed(1)) + '</td>' +
+              '<td class="tabular"><strong>' + def + '</strong></td><td>' + c.estado + '</td>' +
+              '<td>' + (ed ? '<button type="button" class="btn btn-secondary" data-csave="' + c.id + '">Borrador</button> <button type="button" class="btn btn-primary" data-cpub="' + c.id + '">Publicar</button>' : 'Publicada') + '</td></tr>';
+          }).join('') + '</tbody></table></div>' + pagerHtml('doc', pg) + '</div>';
+      }
+
+      else if (db.route === 'est-matricula') {
+        const q = (db.filters.matQ || '').toLowerCase();
+        const list = db.grupos.filter(g => !q || g.cod.toLowerCase().includes(q) || g.asigNom.toLowerCase().includes(q));
+        const pg = paginate(list, 'mat', 4);
+        vp.innerHTML = '<div class="card"><p class="kicker">Módulo Matrícula · Periodo ' + per2.codigo + ' (' + per2.estado + ')</p><h1 style="font-size:1.35rem; margin-bottom:0.4rem;">Inscripción de Asignaturas</h1>' +
+          '<input type="search" placeholder="Buscar grupo o asignatura..." value="' + (db.filters.matQ || '') + '" data-flt="matQ" style="max-width:260px;"/>' +
+          '<div class="table-wrap"><table><thead><tr><th>Grupo / Asignatura</th><th>Créd.</th><th>Prerrequisitos</th><th>Horario y Aula</th><th>Cupos</th><th>Acción</th></tr></thead><tbody>' +
+          pg.slice.map(g => '<tr><td><strong>' + g.cod + '</strong> · ' + g.asigNom + '</td><td class="tabular">' + g.cred + '</td><td>' + (g.prereq.join(', ') || 'Ninguno') + '</td><td class="tabular">' + g.horario + ' · ' + g.aula + '</td><td class="tabular">' + g.cupoOcup + '/' + g.cupoMax + '</td>' +
+            '<td>' + (g.inscritoEst01 ? '<button type="button" class="btn btn-danger" data-mdrop="' + g.id + '">Retirar</button>' : '<button type="button" class="btn btn-primary" data-menroll="' + g.id + '">Inscribir</button>') + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('mat', pg) + '</div>';
+      }
+
+      else if (db.route === 'est-horario') {
+        const q = (db.filters.horQ || '').toLowerCase();
+        const ins = db.grupos.filter(g => g.inscritoEst01 && (!q || g.asigNom.toLowerCase().includes(q)));
+        const pg = paginate(ins, 'hor', 4);
+        vp.innerHTML = '<div class="card"><p class="kicker">Consulta Académica · Solo Lectura</p><h1 style="font-size:1.35rem; margin-bottom:0.5rem;">Mi Horario de Clases</h1>' +
+          '<input type="search" placeholder="Filtrar por asignatura..." value="' + (db.filters.horQ || '') + '" data-flt="horQ" style="max-width:250px;"/>' +
+          '<div class="table-wrap"><table><thead><tr><th>Grupo</th><th>Asignatura</th><th>Docente</th><th>Horario</th><th>Aula</th></tr></thead><tbody>' +
+          pg.slice.map(g => '<tr><td><strong>' + g.cod + '</strong></td><td>' + g.asigNom + '</td><td>' + g.docenteNom + '</td><td class="tabular">' + g.horario + '</td><td>' + g.aula + '</td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('hor', pg) + '</div>';
+      }
+
+      else if (db.route === 'est-notas') {
+        const pubs = db.calificaciones.filter(c => c.estId === u.id && c.estado === 'publicada').map(c => ({ periodo: c.periodo, cod: c.asigCod, nom: c.asigNom, cred: c.cred, nota: +(c.c1 * 0.3 + c.c2 * 0.3 + c.ex * 0.4).toFixed(2) }));
+        const all = db.aprobadasEst01.concat(pubs);
+        const q = (db.filters.notEstQ || '').toLowerCase();
+        const list = all.filter(x => !q || x.nom.toLowerCase().includes(q) || x.cod.toLowerCase().includes(q));
+        const pg = paginate(list, 'estnotas', 4);
+        vp.innerHTML = '<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;"><div><p class="kicker">Certificación Académica · Solo Calificaciones Publicadas (RF-16 / RF-19)</p><h1 style="font-size:1.35rem;">Historial y Certificado de Calificaciones</h1></div>' +
+          '<button type="button" id="btn-est-pdf" class="btn btn-primary no-print">Emitir Certificado PDF</button></div>' +
+          '<div style="margin-top:0.75rem;" class="no-print"><input type="search" placeholder="Buscar asignatura..." value="' + (db.filters.notEstQ || '') + '" data-flt="notEstQ" style="max-width:250px;"/></div>' +
+          '<div class="table-wrap"><table><thead><tr><th>Periodo</th><th>Código</th><th>Asignatura</th><th>Créditos</th><th>Calificación Publicada</th></tr></thead><tbody>' +
+          pg.slice.map(x => '<tr><td class="tabular">' + x.periodo + '</td><td class="tabular"><strong>' + x.cod + '</strong></td><td>' + x.nom + '</td><td class="tabular">' + x.cred + '</td><td class="tabular"><strong>' + x.nota.toFixed(2) + '</strong></td></tr>').join('') +
+          '</tbody></table></div>' + pagerHtml('estnotas', pg) + '</div>';
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.fill) { document.getElementById('in-email').value = b.dataset.fill; document.getElementById('in-pass').value = 'Siga2026!'; }
+      if (b.dataset.nav) navigate(b.dataset.nav);
+      if (b.dataset.pg) { const [k, d] = b.dataset.pg.split(':'); db.pages[k] = (db.pages[k] || 1) + Number(d); render(); }
+      if (b.id === 'u-cancel') { db.editUserId = null; render(); }
+      if (b.dataset.uedit) { db.editUserId = b.dataset.uedit; render(); }
+      if (b.dataset.ulock) {
+        const t = db.usuarios.find(x => x.id === b.dataset.ulock);
+        if (t) { t.bloqueado = !t.bloqueado; t.intentos = t.bloqueado ? 5 : 0; logAudit(db.currentUser.correo, t.bloqueado ? 'BLOQUEO_USUARIO' : 'DESBLOQUEO_USUARIO', 'Usuario:' + t.id, t.correo); notify('Estado de bloqueo actualizado para ' + t.correo); render(); }
+      }
+      if (b.dataset.uact) {
+        const t = db.usuarios.find(x => x.id === b.dataset.uact);
+        if (t) { t.activo = !t.activo; logAudit(db.currentUser.correo, t.activo ? 'ACTIVACION_USUARIO' : 'DESACTIVACION_USUARIO', 'Usuario:' + t.id, t.correo); notify('Estado activo modificado para ' + t.correo); render(); }
+      }
+      if (b.id === 'p-cancel') { db.editProgId = null; render(); }
+      if (b.dataset.pedit) { db.editProgId = b.dataset.pedit; render(); }
+      if (b.id === 'pl-cancel') { db.editPlanId = null; render(); }
+      if (b.dataset.pledit) { db.editPlanId = b.dataset.pledit; render(); }
+      if (b.id === 'a-cancel') { db.editCourseId = null; render(); }
+      if (b.dataset.aedit) { db.editCourseId = b.dataset.aedit; render(); }
+      if (b.dataset.pstate) {
+        const [cod, st] = b.dataset.pstate.split(':');
+        const p = db.periodos.find(x => x.codigo === cod);
+        if (p) { p.estado = st; logAudit(db.currentUser.correo, 'CAMBIO_ESTADO_PERIODO', 'PeriodoAcadémico:' + cod, 'Nuevo estado: ' + st); notify('Periodo ' + cod + ' en estado ' + st); render(); }
+      }
+      if (b.dataset.dgrp) { db.selectedTeacherGroupId = b.dataset.dgrp; render(); }
+      if (b.dataset.csave || b.dataset.cpub) {
+        const id = b.dataset.csave || b.dataset.cpub;
+        const pub = Boolean(b.dataset.cpub);
+        const c = db.calificaciones.find(x => x.id === id);
+        const g = c && db.grupos.find(x => x.id === c.grupoId);
+        if (!g || g.docenteId !== db.currentUser.id) { logAudit(db.currentUser.correo, 'ACCESO_DENEGADO_403', 'Grupo:' + (c ? c.grupoCod : ''), 'Docente no titular'); return notify('Acceso denegado (403)', false); }
+        c.estado = pub ? 'publicada' : 'borrador';
+        logAudit(db.currentUser.correo, pub ? 'CALIFICACION_PUBLICADA' : 'CALIFICACION_BORRADOR', 'Calificación:' + c.id, c.estCod + ' en ' + c.grupoCod);
+        if (pub) db.notificaciones.unshift({ fecha: nowStr(), estId: c.estId, tipo: 'NOTA_PUBLICADA', msg: 'Calificación publicada en ' + c.asigNom + ' (' + c.grupoCod + ').' });
+        notify(pub ? 'Calificación publicada oficialmente.' : 'Guardada en borrador.'); render();
+      }
+      if (b.dataset.menroll) {
+        const g = db.grupos.find(x => x.id === b.dataset.menroll);
+        const per = db.periodos.find(p => p.codigo === '2026-2');
+        const errs = [];
+        if (per.estado !== 'matrícula abierta') errs.push('El periodo 2026-2 está en "' + per.estado + '".');
+        if (db.grupos.some(x => x.inscritoEst01 && x.asigCod === g.asigCod)) errs.push('Asignatura duplicada en el periodo.');
+        if (g.cupoOcup >= g.cupoMax) errs.push('Sin cupos disponibles en ' + g.cod + '.');
+        const apCod = db.aprobadasEst01.map(a => a.cod);
+        const faltan = g.prereq.filter(r => !apCod.includes(r));
+        if (faltan.length) errs.push('Faltan prerrequisitos: ' + faltan.join(', ') + '.');
+        db.grupos.filter(x => x.inscritoEst01).forEach(ins => { if (ins.dia === g.dia && ins.ini < g.fin && g.ini < ins.fin) errs.push('Cruce de horario el ' + ins.dia + ' con ' + ins.cod + '.'); });
+        if (errs.length) { logAudit(db.currentUser.correo, 'MATRICULA_RECHAZADA', 'Grupo:' + g.cod, errs.join(' ')); return notify('Matrícula rechazada: ' + errs.join(' '), false); }
+        g.inscritoEst01 = true; g.cupoOcup += 1;
+        logAudit(db.currentUser.correo, 'MATRICULA_CONFIRMADA', 'Grupo:' + g.cod, 'Inscripción exitosa');
+        db.notificaciones.unshift({ fecha: nowStr(), estId: db.currentUser.id, tipo: 'MATRICULA_CONFIRMADA', msg: 'Confirmada inscripción en ' + g.cod + ' · ' + g.asigNom + '.' });
+        notify('Matrícula confirmada exitosamente.'); render();
+      }
+      if (b.dataset.mdrop) {
+        const g = db.grupos.find(x => x.id === b.dataset.mdrop);
+        g.inscritoEst01 = false; g.cupoOcup = Math.max(0, g.cupoOcup - 1);
+        logAudit(db.currentUser.correo, 'MATRICULA_CANCELADA', 'Grupo:' + g.cod, 'Retiro voluntario');
+        notify('Grupo retirado.'); render();
+      }
+      if (b.id === 'btn-rep-csv') {
+        const fp = db.filters.repPer || 'TODOS';
+        const fpr = db.filters.repProg || 'TODOS';
+        const fq = (db.filters.repQ || '').toLowerCase();
+        const rows = db.calificaciones.filter(c => (fp === 'TODOS' || c.periodo === fp) && (fpr === 'TODOS' || c.programaId === fpr) && (!fq || c.estNom.toLowerCase().includes(fq) || c.asigNom.toLowerCase().includes(fq)));
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(['\uFEFFPeriodo,Programa,Grupo,Asignatura,Estudiante,Definitiva,Estado\n' + rows.map(c => [c.periodo, db.programas.find(p => p.id === c.programaId)?.nombre || '', c.grupoCod, c.asigNom, c.estNom, (c.c1 * 0.3 + c.c2 * 0.3 + c.ex * 0.4).toFixed(2), c.estado].join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' }));
+        a.download = 'reporte-academico-' + fp + '.csv'; a.click();
+        logAudit(db.currentUser.correo, 'EXPORTACION_CSV', 'Reporte:Consolidado', 'Filtro Periodo=' + fp + ', Programa=' + fpr);
+      }
+      if (b.id === 'btn-rep-pdf' || b.id === 'btn-est-pdf') { logAudit(db.currentUser.correo, 'EXPORTACION_PDF', 'Documento:PDF', 'Impresión PDF'); window.print(); }
+    });
+
+    document.addEventListener('input', (e) => {
+      if (e.target.dataset.flt) {
+        const fltKey = e.target.dataset.flt;
+        const pos = typeof e.target.selectionStart === 'number' ? e.target.selectionStart : null;
+        db.filters[fltKey] = e.target.value;
+        db.pages = {};
+        render();
+        const nextEl = document.querySelector('[data-flt="' + fltKey + '"]');
+        if (nextEl) {
+          nextEl.focus();
+          if (pos !== null && typeof nextEl.setSelectionRange === 'function') {
+            try { nextEl.setSelectionRange(pos, pos); } catch (_) {}
+          }
+        }
+      }
+      if (e.target.dataset.cnote) {
+        const [id, f] = e.target.dataset.cnote.split(':');
+        const c = db.calificaciones.find(x => x.id === id);
+        const v = parseFloat(e.target.value);
+        if (c && !isNaN(v) && v >= 0 && v <= 5) c[f] = v;
+      }
+    });
+
+    document.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (e.target.id === 'form-login') {
+        const em = document.getElementById('in-email').value.trim().toLowerCase();
+        const pw = document.getElementById('in-pass').value;
+        if (!document.getElementById('in-habeas').checked) return notify('Debe aceptar la autorización de tratamiento de datos (Ley 1581 de 2012).', false);
+        const u = db.usuarios.find(x => x.correo.toLowerCase() === em);
+        if (!u) return notify('Credenciales no registradas.', false);
+        if (!u.activo) return notify('Cuenta desactivada por el Administrador.', false);
+        if (u.bloqueado) return notify('Cuenta bloqueada por intentos fallidos (RF-13).', false);
+        if (pw !== 'Siga2026!') {
+          u.intentos += 1; if (u.intentos >= 5) u.bloqueado = true;
+          logAudit(u.correo, u.bloqueado ? 'BLOQUEO_AUTOMATICO' : 'LOGIN_FALLIDO', 'Usuario:' + u.id, 'Intento ' + u.intentos + '/5');
+          return notify(u.bloqueado ? 'Cuenta bloqueada tras 5 intentos fallidos.' : 'Contraseña inválida (' + u.intentos + '/5).', false);
+        }
+        u.intentos = 0; db.currentUser = u;
+        logAudit(u.correo, 'LOGIN_EXITOSO', 'Usuario:' + u.id, 'Inicio de sesión con rol ' + u.rol);
+        document.getElementById('alert-box').classList.add('hidden');
+        navigate('panel');
+      }
+      if (e.target.id === 'form-usr') {
+        const nom = document.getElementById('u-nom').value.trim();
+        const cor = document.getElementById('u-cor').value.trim().toLowerCase();
+        const doc = document.getElementById('u-doc').value.trim();
+        const rol = document.getElementById('u-rol').value;
+        const cod = document.getElementById('u-cod').value.trim();
+        if (nom.length < 4 || !cor.includes('@') || !/^\d{6,12}$/.test(doc) || cod.length < 3) return notify('Verifique nombre, correo válido, documento numérico y código.', false);
+        if (db.editUserId) {
+          const ex = db.usuarios.find(x => x.id === db.editUserId);
+          const cambioRol = ex.rol !== rol;
+          Object.assign(ex, { nombre: nom, correo: cor, doc, rol, codigo: cod });
+          logAudit(db.currentUser.correo, cambioRol ? 'CAMBIO_ROL_USUARIO' : 'EDICION_USUARIO', 'Usuario:' + ex.id, cor + ' -> ' + rol);
+          db.editUserId = null; notify('Usuario actualizado.'); render();
+        } else {
+          const id = 'usr-' + Date.now();
+          db.usuarios.unshift({ id, nombre: nom, correo: cor, doc, rol, codigo: cod, activo: true, bloqueado: false, intentos: 0 });
+          logAudit(db.currentUser.correo, 'CREACION_USUARIO', 'Usuario:' + id, cor + ' (' + rol + ')');
+          notify('Usuario creado correctamente.'); render();
+        }
+      }
+      if (e.target.id === 'form-prog') {
+        const c = document.getElementById('p-cod').value.trim(); const n = document.getElementById('p-nom').value.trim();
+        if (!c || !n) return notify('Complete código y nombre del programa.', false);
+        if (db.editProgId) {
+          Object.assign(db.programas.find(x => x.id === db.editProgId), { codigo: c, nombre: n });
+          logAudit(db.currentUser.correo, 'EDICION_PROGRAMA', 'Programa:' + c, n);
+          db.editProgId = null; notify('Programa actualizado.'); render();
+        } else {
+          db.programas.push({ id: 'prog-' + Date.now(), codigo: c, nombre: n });
+          logAudit(db.currentUser.correo, 'CREACION_PROGRAMA', 'Programa:' + c, n); notify('Programa registrado.'); render();
+        }
+      }
+      if (e.target.id === 'form-plan') {
+        const programaId = document.getElementById('pl-prog').value;
+        const version = document.getElementById('pl-ver').value.trim();
+        const creditos = Number(document.getElementById('pl-cred').value);
+        if (!version || creditos < 60) return notify('Indique versión válida y créditos >= 60.', false);
+        if (db.editPlanId) {
+          Object.assign(db.planes.find(x => x.id === db.editPlanId), { programaId, version, creditos });
+          logAudit(db.currentUser.correo, 'EDICION_PLAN_ESTUDIO', 'PlanEstudio:' + version, creditos + ' créditos');
+          db.editPlanId = null; notify('Plan de estudio actualizado.'); render();
+        } else {
+          db.planes.push({ id: 'plan-' + Date.now(), programaId, version, creditos });
+          logAudit(db.currentUser.correo, 'CREACION_PLAN_ESTUDIO', 'PlanEstudio:' + version, creditos + ' créditos');
+          notify('Plan de estudio creado.'); render();
+        }
+      }
+      if (e.target.id === 'form-asig') {
+        const codigo = document.getElementById('a-cod').value.trim().toUpperCase();
+        const nombre = document.getElementById('a-nom').value.trim();
+        const creditos = Number(document.getElementById('a-cred').value);
+        const semestre = Number(document.getElementById('a-sem').value);
+        if (!codigo || !nombre || creditos < 1 || semestre < 1) return notify('Código, nombre, créditos y semestre válidos son obligatorios.', false);
+        if (db.editCourseId) {
+          Object.assign(db.asignaturas.find(x => x.id === db.editCourseId), { codigo, nombre, creditos, semestre });
+          logAudit(db.currentUser.correo, 'EDICION_ASIGNATURA', 'Asignatura:' + codigo, nombre);
+          db.editCourseId = null; notify('Asignatura actualizada.'); render();
+        } else {
+          db.asignaturas.unshift({ id: 'a-' + Date.now(), planId: 'plan-is-2024', codigo, nombre, creditos, semestre, prereq: [] });
+          logAudit(db.currentUser.correo, 'CREACION_ASIGNATURA', 'Asignatura:' + codigo, nombre);
+          notify('Asignatura creada.'); render();
+        }
+      }
+      if (e.target.id === 'form-per') {
+        const codigo = document.getElementById('per-c').value.trim(); const nombre = document.getElementById('per-n').value.trim();
+        if (!codigo || !nombre) return notify('Indique código y nombre del periodo.', false);
+        db.periodos.unshift({ codigo, nombre, estado: 'planeado', ini: '2027-01-10', fin: '2027-02-10' });
+        logAudit(db.currentUser.correo, 'CREACION_PERIODO', 'PeriodoAcadémico:' + codigo, nombre); notify('Periodo creado.'); render();
+      }
+      if (e.target.id === 'form-grp') {
+        const cod = document.getElementById('g-cod').value.trim().toUpperCase();
+        const asig = db.asignaturas.find(a => a.id === document.getElementById('g-asig').value);
+        const doc = db.usuarios.find(u => u.id === document.getElementById('g-doc').value);
+        const dia = document.getElementById('g-dia').value;
+        const hIni = document.getElementById('g-hini').value || '08:00';
+        const hFin = document.getElementById('g-hfin').value || '10:00';
+        const toMin = (s) => { const [h, m] = s.split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+        const ini = toMin(hIni); const fin = toMin(hFin);
+        const cupoMax = Number(document.getElementById('g-cupo').value);
+        const aula = document.getElementById('g-aula').value.trim();
+        if (!cod || !asig || !doc || cupoMax < 5 || fin <= ini || !aula) return notify('Complete código de grupo, cupo >= 5, aula y horario válido (fin > inicio).', false);
+        db.grupos.unshift({ id: 'grp-' + Date.now(), cod, asigCod: asig.codigo, asigNom: asig.nombre, cred: asig.creditos, prereq: asig.prereq, docenteId: doc.id, docenteNom: doc.nombre, periodo: '2026-2', cupoMax, cupoOcup: 0, dia, ini, fin, horario: dia + ' ' + hIni + '–' + hFin, aula, inscritoEst01: false });
+        logAudit(db.currentUser.correo, 'CREACION_GRUPO', 'Grupo:' + cod, asig.nombre + ' · ' + doc.nombre + ' · ' + dia + ' ' + hIni + '–' + hFin); notify('Grupo creado.'); render();
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      if (db.currentUser) logAudit(db.currentUser.correo, 'LOGOUT_USUARIO', 'Usuario:' + db.currentUser.id, 'Cierre de sesión');
+      db.currentUser = null; render();
+    });
+    document.getElementById('btn-back-panel').addEventListener('click', () => navigate('panel'));
+    document.getElementById('alert-close').addEventListener('click', () => document.getElementById('alert-box').classList.add('hidden'));
+    document.getElementById('btn-recover').addEventListener('click', () => notify('Se enviaron instrucciones de restablecimiento (vigencia 15 min) al correo indicado.'));
+    document.getElementById('btn-open-pass').addEventListener('click', () => document.getElementById('pass-box').classList.toggle('hidden'));
+    document.getElementById('btn-cancel-pass').addEventListener('click', () => document.getElementById('pass-box').classList.add('hidden'));
+    document.getElementById('btn-save-pass').addEventListener('click', () => {
+      const v = document.getElementById('new-pass-input').value;
+      if (v.length < 8) return notify('La contraseña debe tener al menos 8 caracteres.', false);
+      logAudit(db.currentUser.correo, 'CAMBIO_CONTRASENA', 'Usuario:' + db.currentUser.id, 'Actualización Argon2id');
+      document.getElementById('new-pass-input').value = ''; document.getElementById('pass-box').classList.add('hidden');
+      notify('Contraseña actualizada correctamente.');
+    });
+    window.addEventListener('hashchange', () => {
+      const r = window.location.hash.replace(/^#\/?/, '').trim();
+      if (r && r !== db.route) navigate(r);
+    });
+    render();
+  </script>
+</body>
+</html>
